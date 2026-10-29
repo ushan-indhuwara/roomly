@@ -48,10 +48,10 @@ export default function Header({
 
   const handleExportPDF = async () => {
     try {
-      onNotify('Generating architectural PDF with 2D blueprint & 4x 3D renders (Top, Walk-in, 4-Walls, 2-Walls)...');
+      onNotify('Generating PDF...');
       setShowExportMenu(false);
       await exportDesignPDF(room, unit);
-      onNotify('Downloaded complete Room Spec Sheet PDF with 2D plan and 4x 3D renders!');
+      onNotify('PDF downloaded');
     } catch (err) {
       console.error(err);
       onNotify('Failed to generate PDF: ' + (err.message || 'Error'));
@@ -61,13 +61,13 @@ export default function Header({
   const handleExportJSON = () => {
     exportDesignJSON(room, shoppingList, unit);
     setShowExportMenu(false);
-    onNotify('Exported room design as JSON');
+    onNotify('Project exported (.json)');
   };
 
   const handleExportOBJ = () => {
     exportRoomOBJ(room, CATALOG);
     setShowExportMenu(false);
-    onNotify('Exported 3D model (.OBJ) for CAD & 3D viewers');
+    onNotify('3D model exported (.obj)');
   };
 
   return (
@@ -155,74 +155,88 @@ export default function Header({
           </button>
 
           {showExportMenu && (
-            <div style={{
-              position: 'absolute',
-              right: 0,
-              top: '100%',
-              marginTop: '0.5rem',
-              background: '#FFFFFF',
-              borderRadius: '14px',
-              boxShadow: 'var(--shadow-lg)',
-              border: '1px solid var(--border-light)',
-              minWidth: '260px',
-              padding: '0.55rem',
-              zIndex: 150
-            }}>
-              {/* Primary PDF Spec Sheet */}
-              <button
-                className="btn btn-secondary"
-                style={{ 
-                  width: '100%', 
-                  justifyContent: 'flex-start', 
-                  border: '1.5px solid var(--sage-200)', 
-                  padding: '0.65rem 0.85rem',
-                  background: 'var(--sage-50)',
-                  borderRadius: '10px',
-                  marginBottom: '0.45rem'
-                }}
-                onClick={handleExportPDF}
-              >
-                <FileText size={18} color="#3B5745" />
-                <div style={{ textAlign: 'left', marginLeft: '0.45rem', flex: 1 }}>
-                  <div style={{ fontWeight: 700, fontSize: '0.82rem', color: '#1D231F' }}>
-                    Room Spec Sheet (.PDF)
-                  </div>
-                  <div style={{ fontSize: '0.68rem', color: '#626D65' }}>
-                    2D Blueprint + 4x 3D Renders + Specs
-                  </div>
-                </div>
-                <span style={{ 
-                  fontSize: '0.62rem', 
-                  background: '#3B5745', 
-                  color: '#fff', 
-                  padding: '2px 6px', 
-                  borderRadius: '4px', 
-                  fontWeight: 800 
-                }}>
-                  PDF
-                </span>
-              </button>
+            <>
+              <div 
+                style={{ position: 'fixed', inset: 0, zIndex: 140 }}
+                onClick={() => setShowExportMenu(false)}
+              />
+              <div style={{
+                position: 'absolute',
+                right: 0,
+                top: '100%',
+                marginTop: '0.4rem',
+                background: '#FFFFFF',
+                borderRadius: '12px',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
+                border: '1px solid #E6E1D6',
+                minWidth: '175px',
+                padding: '0.35rem',
+                zIndex: 150,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.2rem'
+              }}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  style={{ 
+                    width: '100%', 
+                    justifyContent: 'flex-start', 
+                    border: 'none', 
+                    padding: '0.45rem 0.65rem',
+                    fontSize: '0.8rem',
+                    borderRadius: '8px',
+                    gap: '0.5rem',
+                    color: '#26342B',
+                    fontWeight: 600
+                  }}
+                  onClick={handleExportPDF}
+                >
+                  <FileText size={15} color="#3B5745" />
+                  <span>PDF Document</span>
+                </button>
 
-              {/* JSON Data */}
-              <button
-                className="btn btn-secondary"
-                style={{ width: '100%', justifyContent: 'flex-start', border: 'none', padding: '0.5rem 0.85rem' }}
-                onClick={handleExportJSON}
-              >
-                <FileCode size={15} color="#466352" />
-                <span style={{ marginLeft: '0.45rem', fontSize: '0.8rem' }}>Room Design Data (.JSON)</span>
-              </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  style={{ 
+                    width: '100%', 
+                    justifyContent: 'flex-start', 
+                    border: 'none', 
+                    padding: '0.45rem 0.65rem',
+                    fontSize: '0.8rem',
+                    borderRadius: '8px',
+                    gap: '0.5rem',
+                    color: '#26342B',
+                    fontWeight: 600
+                  }}
+                  onClick={handleExportJSON}
+                >
+                  <FileCode size={15} color="#466352" />
+                  <span>Project Data (.json)</span>
+                </button>
 
-              {/* 3D Model */}
-              <button
-                className="btn btn-secondary"
-                style={{ width: '100%', justifyContent: 'flex-start', border: 'none', padding: '0.5rem 0.85rem' }}
-                onClick={handleExportOBJ}
-              >
-                <Box size={15} color="#CCA262" />
-                <span style={{ marginLeft: '0.45rem', fontSize: '0.8rem' }}>3D CAD Model (.OBJ)</span>
-              </button>
-            </div>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  style={{ 
+                    width: '100%', 
+                    justifyContent: 'flex-start', 
+                    border: 'none', 
+                    padding: '0.45rem 0.65rem',
+                    fontSize: '0.8rem',
+                    borderRadius: '8px',
+                    gap: '0.5rem',
+                    color: '#26342B',
+                    fontWeight: 600
+                  }}
+                  onClick={handleExportOBJ}
+                >
+                  <Box size={15} color="#B88A44" />
+                  <span>3D CAD Model (.obj)</span>
+                </button>
+              </div>
+            </>
           )}
         </div>
 
