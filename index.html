@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Roomly — Plan, Furnish & Experience Rooms in 3D</title>
+    <meta name="description" content="Plan your room to scale and check furniture fit before buying. Arrange furniture in 2D architectural scale, explore in 3D, and share your floor plans for free." />
+    <meta name="theme-color" content="#FAF8F5" />
+
+    <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Roomly — Plan, Furnish & Experience Rooms to Scale" />
+    <meta property="og:description" content="Design rooms to scale, preview furniture fits with zero guesswork, and walk through in 3D before buying. Free & no sign-up needed." />
+    <meta property="og:site_name" content="Roomly Studio" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Roomly — Architectural Floor Planning & 3D Previews" />
+    <meta name="twitter:description" content="Plan rooms to scale and check furniture fit before buying. Try ideas in 3D and share your design." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛋️</text></svg>">
+    
+    <!-- High-Performance Preload for Realistic 3D Furniture Assets -->
+    <link rel="preload" href="/models/sofa.glb" as="fetch" crossorigin="anonymous" />
+    <link rel="preload" href="/models/chair.glb" as="fetch" crossorigin="anonymous" />
+    <link rel="preload" href="/models/plant.glb" as="fetch" crossorigin="anonymous" />
+    <link rel="preload" href="/models/pouf.glb" as="fetch" crossorigin="anonymous" />
+    <link rel="preload" href="/models/vase.glb" as="fetch" crossorigin="anonymous" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
