@@ -58,11 +58,13 @@ export default function JournalPage({ onBackToPlanner, onReadArticle, currentRoo
       <div className="journal-articles-container">
         <div className="article-grid">
           {filteredArticles.map(article => (
-            <article 
-              key={article.id} 
-              className="article-card journal-page-card"
-              onClick={() => onReadArticle(article)}
-            >
+            <article key={article.id} className="journal-page-card">
+              <a
+                href={`/journal/${encodeURIComponent(article.id)}/`}
+                className="article-card journal-article-link"
+                onClick={(event) => { event.preventDefault(); onReadArticle(article); }}
+                aria-label={`Read ${article.title}`}
+              >
               <div 
                 className="article-cover" 
                 style={{ background: article.gradient || '#FAF7F0' }}
@@ -80,6 +82,7 @@ export default function JournalPage({ onBackToPlanner, onReadArticle, currentRoo
                   <ArrowRight size={14} color="var(--sage-700)" />
                 </div>
               </div>
+              </a>
             </article>
           ))}
         </div>

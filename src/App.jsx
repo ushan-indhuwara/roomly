@@ -2,7 +2,7 @@
 // State coordination, 2D/3D mode toggle, undo/redo, localStorage persistence, modals
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ROOM_PRESETS, CATALOG } from './data/roomData';
+import { ROOM_PRESETS, CATALOG, ARTICLES } from './data/roomData';
 import { parseShareUrl } from './utils/exportUtils';
 
 import Header from './components/Header';
@@ -24,6 +24,8 @@ import SharedRoomBanner from './components/SharedRoomBanner';
 import FirstUseGuide from './components/FirstUseGuide';
 import FunnelInsightsModal from './components/FunnelInsightsModal';
 import { trackEvent } from './utils/analytics';
+import { trackGooglePageView } from './utils/googleAnalytics';
+import { updatePageSeo } from './utils/seo';
 
 import { LayoutGrid, Box, Undo2, Redo2, Layers, CheckCircle2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -31,6 +33,29 @@ import confetti from 'canvas-confetti';
 const LOCAL_STORAGE_KEY = 'roomly_active_design_v1';
 const SAVED_ROOMS_KEY = 'roomly_saved_rooms_v1';
 const ONBOARDING_KEY = 'roomly_started_planning_v1';
+
+function getRouteFromLocation() {
+  try {
+    const pathname = window.location.pathname.replace(/\/+$/, '') || '/';
+    if (pathname === '/studio' || pathname === '/planner') return { page: 'planner', article: null };
+    if (pathname === '/setup') return { page: 'setup', article: null };
+    if (pathname === '/journal') return { page: 'journal', article: null };
+
+    const articleMatch = pathname.match(/^\/journal\/([^/]+)$/);
+    if (articleMatch) {
+      return {
+        page: 'journal',
+        article: ARTICLES.find(article => article.id === decodeURIComponent(articleMatch[1])) || null,
+      };
+    }
+
+    const hash = (window.location.hash || '').toLowerCase();
+    if (hash === '#studio' || hash === '#planner' || hash.startsWith('#share=')) return { page: 'planner', article: null };
+    if (hash === '#setup') return { page: 'setup', article: null };
+    if (hash === '#journal') return { page: 'journal', article: null };
+  } catch (e) {}
+  return { page: 'welcome', article: null };
+}
 
 // Helper to guarantee every room layout has movable, editable, deletable window & door items
 function ensureRoomFixtures(r) {
@@ -143,14 +168,7 @@ export default function App() {
   // Active page state: 'welcome' (default Home Page), 'planner', 'setup', or 'journal'
   const [activePage, setActivePage] = useState(() => {
     if (sharedRoom) return 'planner';
-    try {
-      const hash = (window.location.hash || '').toLowerCase();
-      if (hash === '#studio' || hash === '#planner') return 'planner';
-      if (hash === '#setup') return 'setup';
-      if (hash === '#journal') return 'journal';
-    } catch (e) {}
-    // The home page is ALWAYS the default when visiting the website
-    return 'welcome';
+    return getRouteFromLocation().page;
   });
 
   // Load initial room from share, localStorage, or default preset (Living Room)
@@ -186,7 +204,7 @@ export default function App() {
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isFunnelInsightsOpen, setIsFunnelInsightsOpen] = useState(false);
-  const [activeArticle, setActiveArticle] = useState(null);
+  const [activeArticle, setActiveArticle] = useState(() => getRouteFromLocation().article);
 
   // Undo / Redo history stack
   const historyRef = useRef([JSON.stringify(room)]);
@@ -270,38 +288,74 @@ export default function App() {
 
   const handleNavigate = useCallback((page) => {
     setActivePage(page);
+    setActiveArticle(null);
     try {
-      if (page === 'planner') {
-        window.location.hash = 'studio';
-      } else if (page === 'setup') {
-        window.location.hash = 'setup';
-      } else if (page === 'journal') {
-        window.location.hash = 'journal';
-      } else if (page === 'welcome') {
-        window.location.hash = '';
+      const routeByPage = { welcome: '/', planner: '/studio/', setup: '/setup/', journal: '/journal/' };
+      const nextPath = routeByPage[page] || '/';
+      if (window.location.pathname !== nextPath) window.history.pushState({}, '', nextPath);
+    } catch (e) {}
+  }, []);
+
+  const handleReadArticle = useCallback((article) => {
+    setActivePage('journal');
+    setActiveArticle(article);
+    try {
+      window.history.pushState({}, '', `/journal/${encodeURIComponent(article.id)}/`);
+    } catch (e) {}
+  }, []);
+
+  const handleCloseArticle = useCallback(() => {
+    setActiveArticle(null);
+    try {
+      if (/^\/journal\/[^/]+\/?$/.test(window.location.pathname)) {
+        window.history.pushState({}, '', '/journal/');
       }
     } catch (e) {}
   }, []);
 
-  // Synchronize browser URL hash with active page
+  // Keep app state in sync with path navigation and older shared hash links.
   useEffect(() => {
-    const handleHash = () => {
-      const hash = (window.location.hash || '').toLowerCase();
-      if (hash.startsWith('#share=')) {
-        setActivePage('planner');
-      } else if (hash === '#studio' || hash === '#planner') {
-        setActivePage('planner');
-      } else if (hash === '#setup') {
-        setActivePage('setup');
-      } else if (hash === '#journal') {
-        setActivePage('journal');
-      } else {
-        setActivePage('welcome');
-      }
+    const handleLocationChange = () => {
+      const route = getRouteFromLocation();
+      setActivePage(route.page);
+      setActiveArticle(route.article);
     };
-    window.addEventListener('hashchange', handleHash);
-    return () => window.removeEventListener('hashchange', handleHash);
+    window.addEventListener('popstate', handleLocationChange);
+    window.addEventListener('hashchange', handleLocationChange);
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      window.removeEventListener('hashchange', handleLocationChange);
+    };
   }, []);
+
+  useEffect(() => {
+    const pageRoutes = {
+      welcome: '/',
+      planner: '/studio/',
+      setup: '/setup/',
+      journal: '/journal/',
+    };
+    const path = activeArticle ? `/journal/${activeArticle.id}/` : pageRoutes[activePage] || '/';
+    const title = activeArticle
+      ? `${activeArticle.title} | Roomly Design Journal`
+      : activePage === 'journal'
+        ? 'Roomly Design Journal | Room Layout & Interior Guides'
+        : activePage === 'planner'
+          ? 'Free 2D & 3D Room Planner | Roomly'
+          : activePage === 'setup'
+            ? 'Set Up Your Room Plan | Roomly'
+            : 'Roomly — Plan, Furnish & Experience Rooms in 3D';
+    const description = activeArticle?.summary || (activePage === 'journal'
+      ? 'Practical interior design guides for room layouts, small spaces, lighting, and furnishing your home.'
+      : activePage === 'planner'
+        ? 'Plan a room to scale, arrange furniture in 2D, and preview your layout in 3D with Roomly.'
+        : activePage === 'setup'
+          ? 'Choose a room type and dimensions to start a free, to-scale room plan with Roomly.'
+          : 'Plan your room to scale and check furniture fit before buying. Arrange furniture in 2D, explore in 3D, and share your floor plans for free.');
+
+    updatePageSeo({ title, description, path });
+    trackGooglePageView(path, title);
+  }, [activePage, activeArticle]);
 
   // Presets & Room actions
   const handleSelectPreset = (preset) => {
@@ -732,7 +786,7 @@ export default function App() {
         /* Dedicated Journal Page */
         <JournalPage
           onBackToPlanner={() => handleNavigate('planner')}
-          onReadArticle={(article) => setActiveArticle(article)}
+          onReadArticle={handleReadArticle}
           currentRoomName={room?.name}
         />
       )}
@@ -817,11 +871,10 @@ export default function App() {
 
       <ArticleReaderModal
         article={activeArticle}
-        onClose={() => setActiveArticle(null)}
+        onClose={handleCloseArticle}
         onAddFeaturedPiece={(pieceKey) => {
           handleAddItem(pieceKey);
-          setActiveArticle(null);
-          setActivePage('planner');
+          handleNavigate('planner');
         }}
       />
 

@@ -1,6 +1,7 @@
 // Roomly - Privacy-Conscious Funnel Analytics Utility
-// Zero-cookie, local-first analytics to track visitor drop-off and conversion
-// No personal data, IP addresses, or cross-site tracking cookies collected.
+// Local-first funnel totals plus optional Google Analytics events when configured.
+
+import { trackGoogleEvent } from './googleAnalytics';
 
 const STORAGE_KEY = 'roomly_funnel_stats_v1';
 const SESSION_KEY = 'roomly_session_events_v1';
@@ -58,6 +59,7 @@ function recordSessionEvent(eventId) {
 
 export function trackEvent(eventName, metadata = {}) {
   try {
+    trackGoogleEvent(eventName, metadata);
     const stats = getStoredStats();
     const sessionEvents = getSessionEvents();
 

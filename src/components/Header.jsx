@@ -73,32 +73,34 @@ export default function Header({
   return (
     <header className="roomly-header">
       <div className="brand-group">
-        <button 
-          onClick={() => onNavigate && onNavigate('welcome')} 
+        <a
+          href="/"
+          onClick={(event) => { event.preventDefault(); onNavigate && onNavigate('welcome'); }}
           className="brand-logo"
           title="Return to Roomly Home Page"
-          style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         >
           roomly<span className="brand-dot">.</span>
-        </button>
+        </a>
         <span className="brand-badge">Studio</span>
 
         <nav className="nav-links">
-          <button 
+          <a
+            href="/studio/"
             className={`nav-link ${activePage === 'planner' ? 'active' : ''}`}
-            onClick={() => onNavigate && onNavigate('planner')}
+            onClick={(event) => { event.preventDefault(); onNavigate && onNavigate('planner'); }}
           >
             Studio Planner
-          </button>
+          </a>
           <button className="nav-link" onClick={onOpenShopping}>
             Shopping List ({room?.items?.length || 0})
           </button>
-          <button 
+          <a
+            href="/journal/"
             className={`nav-link ${activePage === 'journal' ? 'active' : ''}`}
-            onClick={() => onNavigate && onNavigate('journal')}
+            onClick={(event) => { event.preventDefault(); onNavigate && onNavigate('journal'); }}
           >
             Design Journal
-          </button>
+          </a>
         </nav>
       </div>
 
