@@ -41,7 +41,7 @@ export default function ShareModal({ isOpen, onClose, room, unit = 'm', onNotify
     }
   };
 
-  const handleSocialShare = (platform) => {
+  const handleSocialShare = (platform, pinStyle = 'layout') => {
     trackEvent('share_room', { method: platform, roomName: room.name });
     let url = '';
     const encodedUrl = encodeURIComponent(shareUrl);
@@ -54,7 +54,22 @@ export default function ShareModal({ isOpen, onClose, room, unit = 'm', onNotify
     } else if (platform === 'email') {
       url = `mailto:?subject=${encodeURIComponent(`Roomly Design: ${room.name}`)}&body=${encodedText}%0A%0A${encodedUrl}`;
     } else if (platform === 'pinterest') {
-      url = `https://pinterest.com/pin/create/button/?url=${encodedUrl}&description=${encodedText}`;
+      const pinImages = {
+        layout: 'roomly-layout.png',
+        space: 'roomly-small-space.png',
+        preview: 'roomly-3d-preview.png'
+      };
+      const pinDescriptions = {
+        layout: `Plan your room before you buy. Measure, arrange furniture to scale, and preview your ${room.name || 'room'} in 3D with Roomly.`,
+        space: `Make every corner count. Find a furniture layout for your ${room.name || 'room'} that leaves room to live with Roomly.`,
+        preview: `Design it, then walk through it. Explore your ${room.name || 'room'} layout in 3D with Roomly before you buy.`
+      };
+      const pinParams = new URLSearchParams({
+        url: shareUrl,
+        media: `${window.location.origin}/pinterest/${pinImages[pinStyle]}`,
+        description: pinDescriptions[pinStyle] || encodedText
+      });
+      url = `https://pinterest.com/pin/create/button/?${pinParams.toString()}`;
     }
 
     if (url) {
@@ -146,8 +161,8 @@ export default function ShareModal({ isOpen, onClose, room, unit = 'm', onNotify
 
           {/* Social Share Buttons */}
           <div className="share-social-section">
-            <div className="share-section-title">Share directly via:</div>
-            <div className="share-social-grid">
+            <div className="share-section-title">Share your room or create a Pinterest post:</div>
+            <div className="share-social-grid share-pinterest-grid">
               <button 
                 type="button" 
                 className="share-social-btn whatsapp"
@@ -164,13 +179,14 @@ export default function ShareModal({ isOpen, onClose, room, unit = 'm', onNotify
                 <span>𝕏</span>
                 <span>X / Twitter</span>
               </button>
-              <button 
-                type="button" 
-                className="share-social-btn pinterest"
-                onClick={() => handleSocialShare('pinterest')}
-              >
-                <span>📌</span>
-                <span>Pinterest</span>
+              <button type="button" className="share-social-btn pinterest" onClick={() => handleSocialShare('pinterest', 'layout')}>
+                <span>📌</span><span>Plan your room</span>
+              </button>
+              <button type="button" className="share-social-btn pinterest" onClick={() => handleSocialShare('pinterest', 'space')}>
+                <span>📌</span><span>Small spaces</span>
+              </button>
+              <button type="button" className="share-social-btn pinterest" onClick={() => handleSocialShare('pinterest', 'preview')}>
+                <span>📌</span><span>3D preview</span>
               </button>
               <button 
                 type="button" 
@@ -196,4 +212,5 @@ export default function ShareModal({ isOpen, onClose, room, unit = 'm', onNotify
     </div>
   );
 }
+
 

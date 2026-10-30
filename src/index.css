@@ -3304,6 +3304,10 @@ a {
   gap: 0.5rem;
 }
 
+.share-pinterest-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .share-social-btn {
   display: flex;
   flex-direction: column;
@@ -5562,3 +5566,4 @@ a {
     max-width: 180px;
   }
 }
+
