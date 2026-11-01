@@ -3,7 +3,8 @@ import { loadEnv } from 'vite';
 import { ARTICLES } from '../src/data/roomData.js';
 
 const env = loadEnv('production', process.cwd(), 'VITE_');
-const configuredSiteUrl = process.env.VITE_SITE_URL || env.VITE_SITE_URL || process.env.URL;
+const DEFAULT_SITE_URL = 'https://roomlya.netlify.app';
+const configuredSiteUrl = process.env.VITE_SITE_URL || env.VITE_SITE_URL || process.env.URL || DEFAULT_SITE_URL;
 const distDirectory = new URL('../dist/', import.meta.url);
 
 await mkdir(distDirectory, { recursive: true });
@@ -13,7 +14,7 @@ if (configuredSiteUrl) {
   try {
     siteOrigin = new URL(configuredSiteUrl).origin;
   } catch {
-    throw new Error('VITE_SITE_URL must be a valid absolute URL, such as https://roomly.netlify.app');
+    throw new Error('VITE_SITE_URL must be a valid absolute URL, such as https://roomlya.netlify.app');
   }
 }
 
