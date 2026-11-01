@@ -1,7 +1,7 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig, loadEnv } from 'vite'
 
-const DEFAULT_SITE_URL = 'https://roomly.netlify.app'
+const DEFAULT_SITE_URL = 'https://roomlya.netlify.app'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
