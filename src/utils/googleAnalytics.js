@@ -33,7 +33,7 @@ export function trackGooglePageView(path, title) {
 }
 
 export function trackGoogleEvent(eventName, metadata = {}) {
-  if (!isInitialized || typeof window.gtag !== 'function') return;
+  if (!consentGranted() || !isInitialized || typeof window.gtag !== 'function') return;
 
   // Room names can be visitor supplied, so only send short, non-identifying values.
   const safeMetadata = Object.fromEntries(
