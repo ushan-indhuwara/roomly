@@ -26,6 +26,7 @@ import FunnelInsightsModal from './components/FunnelInsightsModal';
 import { trackEvent } from './utils/analytics';
 import { trackGooglePageView } from './utils/googleAnalytics';
 import { updatePageSeo } from './utils/seo';
+import AnalyticsConsent from './components/AnalyticsConsent';
 
 import { LayoutGrid, Box, Undo2, Redo2, Layers, CheckCircle2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -882,6 +883,8 @@ export default function App() {
         isOpen={isShortcutsOpen}
         onClose={() => setIsShortcutsOpen(false)}
       />
+
+      <AnalyticsConsent />
 
       {/* Toast Notification */}
       {toast && (
