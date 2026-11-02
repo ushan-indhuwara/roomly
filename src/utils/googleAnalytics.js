@@ -1,8 +1,9 @@
 const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID?.trim() || 'G-0SFP7DX4B3';
+const consentGranted = () => window.localStorage.getItem('roomly_analytics_consent') === 'accepted';
 let isInitialized = false;
 
 export function initializeGoogleAnalytics() {
-  if (isInitialized || !/^G-[A-Z0-9]+$/.test(measurementId || '')) return false;
+  if (isInitialized || !consentGranted() || !/^G-[A-Z0-9]+$/.test(measurementId || '')) return false;
 
   window.dataLayer = window.dataLayer || [];
   window.gtag = function gtag() {
@@ -22,7 +23,7 @@ export function initializeGoogleAnalytics() {
 }
 
 export function trackGooglePageView(path, title) {
-  if (!isInitialized || typeof window.gtag !== 'function') return;
+  if (!consentGranted() || !isInitialized || typeof window.gtag !== 'function') return;
 
   window.gtag('event', 'page_view', {
     page_title: title,
