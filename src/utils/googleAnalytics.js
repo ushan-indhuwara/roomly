@@ -1,5 +1,11 @@
 const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID?.trim() || 'G-0SFP7DX4B3';
-const consentGranted = () => window.localStorage.getItem('roomly_analytics_consent') === 'accepted';
+const consentGranted = () => {
+  try {
+    return window.localStorage.getItem('roomly_analytics_consent') === 'accepted';
+  } catch {
+    return false;
+  }
+};
 let isInitialized = false;
 
 export function initializeGoogleAnalytics() {
