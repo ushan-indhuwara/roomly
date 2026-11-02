@@ -1,4 +1,4 @@
-const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID?.trim();
+const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID?.trim() || 'G-0SFP7DX4B3';
 let isInitialized = false;
 
 export function initializeGoogleAnalytics() {
