@@ -4,7 +4,13 @@ import './index.css'
 import App from './App.jsx'
 import { initializeGoogleAnalytics } from './utils/googleAnalytics.js'
 
-initializeGoogleAnalytics()
+try {
+  if (window.localStorage.getItem('roomly_analytics_consent') === 'accepted') {
+    initializeGoogleAnalytics()
+  }
+} catch {
+  // Keep analytics disabled when browser storage is unavailable.
+}
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
